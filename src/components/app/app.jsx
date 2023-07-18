@@ -3,7 +3,6 @@ import Main from "../main/main";
 import { Switch, Route, Redirect } from "react-router-dom"; // 5 версия
 import CreateArticle from "../../pages/create-article/create-article";
 import Details from "../../pages/details/details";
-import EditArticle from "../../pages/edit-article/edit-article";
 import EditProfileForm from "../../pages/edit-profile-form/edit-profile-form";
 import Home from "../../pages/home/home";
 import LoginForm from "../../pages/login-form/login-form";
@@ -11,7 +10,7 @@ import RegistrationForm from "../../pages/registration-form/registration-form";
 import { useSelector } from "react-redux";
 import { Alert } from "antd";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { fetchFullArticle } from "../../api/api";
 
 
 function App(){
@@ -26,9 +25,23 @@ function App(){
   const error = status === "rejected" && (
     <Alert message="Произошла ошибка. Мы уже работаем над этим." type="error" showIcon />
   );
+
   useEffect(() => {
-    axios.get(`https://blog.kata.academy/api/articles/${slug}`).then(({ data }) => setArticle(data.article));
+    const fetchData = async () => {
+      try {
+        if (slug) {
+          const response = await fetchFullArticle(slug);
+          setArticle(response);
+        }
+      } catch (error) {
+        throw error;
+      }
+    };
+  
+    fetchData();
   }, [slug]);
+  
+  
 
   return (
     <>
@@ -37,10 +50,6 @@ function App(){
         {error}
       <Switch>
       <Route exact path="/" component={Home}>
-            {/* <Home /> */}
-          </Route>
-          <Route path="/articles/:slug/edit">
-            {isAuthor() ? <EditArticle /> : <Redirect to="/" />}
           </Route>
           <Route path="/articles/:slug" component={Details} />
           <Route path="/:new-article" component={CreateArticle} />

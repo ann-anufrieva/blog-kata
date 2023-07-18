@@ -1,8 +1,8 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import Info from "../../components/info/info";
 import { Skeleton } from "antd";
+import { fetchFullArticle } from "../../api/api";
 
 function Details() {
   const [article, setArticle] = useState(null);
@@ -10,9 +10,19 @@ function Details() {
   const { slug } = useParams();
 
   useEffect(() => {
-    axios.get(`https://blog.kata.academy/api/articles/${slug}`).then(({ data }) => setArticle(data.article));
+    const fetchData = async () => {
+      try {
+        if (slug) {
+          const response = await fetchFullArticle(slug);
+          setArticle(response);
+        }
+      } catch (error) {
+        throw error;
+      }
+    };
+  
+    fetchData();
   }, [slug]);
-
   return (
     <div>
       {article ? <Info push={push} {...article} /> : <Skeleton style={{ marginTop: "20px" }} />}

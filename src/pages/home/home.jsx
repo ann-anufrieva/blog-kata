@@ -1,10 +1,10 @@
 import React, {useEffect, useState, useCallback} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom"; // 5 версия
-import axios from "../../api/axios";
 import { fetchArticles, changePage } from "../../store/articlesSlice";
 import List from "../../components/list/list";
 import Card from "../../components/card/card";
+import { allArticles } from "../../api/api";
 
 import { Pagination } from "antd";
 
@@ -18,10 +18,9 @@ const Home = () => {
   const { push } = useHistory();
   const [results, setResults] = useState(1);
 
-  //теги???
   const fetchArticleData = useCallback(async () => {
-    const res = await axios.get(`https://blog.kata.academy/api/articles?limit=5&offset=5`);
-    setResults(res.data.articlesCount);
+    const res = await allArticles();
+    setResults(res);
     dispatch(fetchArticles((pageArticles - 1) * 5));
   }, [dispatch, pageArticles]);
 

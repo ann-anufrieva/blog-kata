@@ -4,8 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom"; 
 import { login, selectIsAuth } from "../../store/authSlice";
 import { Redirect } from "react-router-dom";
-import axios from "axios";
-import BASE_URL from "../../store/articlesSlice";
+import { registerUser } from "../../api/api";
 
 import './registration-form.css';
 
@@ -37,14 +36,12 @@ const RegistrationForm = () => {
         password: data.password,
       },
     };
-    axios
-      .post(`https://blog.kata.academy/api/users`, userData)
-      .then((response) => {
-        dispatch(login(response.data));
-      })
-      .catch((error) => {
-        setError(error.response.data.errors);
-      });
+    try {
+      const response = await registerUser(userData);
+      dispatch(login(response));
+    } catch (error) {
+      setError(error);
+    };
   };
 
   useEffect(() => {

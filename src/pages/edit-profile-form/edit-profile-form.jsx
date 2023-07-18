@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { edit } from "../../store/authSlice";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import  BASE_URL from "../../store/articlesSlice";
-import axios from "axios";
+import { updateUserProfile } from "../../api/api";
+import { fetchUserData } from "../../api/api";
 
 import './edit-profile-form.css';
 
@@ -25,7 +25,7 @@ const EditProfileForm = () => {
 
   const email = watch("email");
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const userData = {
       user: {
         username: data.username,
@@ -36,33 +36,22 @@ const EditProfileForm = () => {
     };
     const token = localStorage.getItem("token");
 
-    axios
-      .put(`https://blog.kata.academy/api/user`, userData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then((response) => {
-        dispatch(edit(response.data));
-        history.push("/");
-      })
-      // eslint-disable-next-line no-shadow
-      .catch((error) => {
-        setError(error.response.data.errors);
-      });
+    try {
+      const response = await updateUserProfile(userData, token);
+      dispatch(edit(response));
+      history.push("/");
+    } catch (error) {
+      setError(error.message);
+    }
   };
+  
   // запрос для отображения старых данных пользователя при переходе на редактирование.
   useEffect(() => {
     async function fetchData() {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`https://blog.kata.academy/api/user`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
-      setUsernameInput(response.data.user.username);
-      setEmailInput(response.data.user.email);
+      const response = await fetchUserData(token);
+      setUsernameInput(response.username);
+      setEmailInput(response.email);
     }
     fetchData();
   }, []);

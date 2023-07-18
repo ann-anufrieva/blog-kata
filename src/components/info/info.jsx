@@ -138,7 +138,7 @@ const Info = (props) => {
           >
             <button className="btn-delete_info">Delete</button>
           </Popconfirm>
-          <Link to={`/articles/${slug}/edit`} className='btn-edit_info'>Edit</Link>
+          <Link to={`/new-article/${slug}`} className='btn-edit_info'>Edit</Link>
         </div>
       ) : null}
     </article>
